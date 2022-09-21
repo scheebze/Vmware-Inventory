@@ -44,14 +44,26 @@ $ScriptBlock = {
     $RandomOffset = Get-Random -Maximum 120
     Start-Sleep -Seconds $RandomOffset
     
-    # Connect to vCenter 
-    try{
-        connect-viserver -server $VCenterName -Credential $Credential -force -erroraction stop 
-        $connectedtoVcenter = $true
-    }Catch{
-        $connectedtoVcenter = $False
+    #Create Tries counter for connecting to vcenter server
+    $Tries = 1
+    $connectedtoVcenter = @()
+
+    While($tries -lt 6 -and !$connectedtoVcenter){
+        # Connect to vCenter 
+        try{
+            connect-viserver -server $VCenterName -Credential $Credential -force -erroraction stop 
+            $connectedtoVcenter = $true
+            $tries = 6
+        }Catch{
+            write-host "failed to connect to $vcentername" -ForegroundColor Red
+            write-host "Starting 10 Second Sleep timer" 
+            write-host "Try # $tries" 
+            start-sleep -Seconds 10
+            $connectedtoVcenter = $False
+            $tries++
+        }
     }
-    
+
     if($connectedtoVcenter -eq $true){
         # Empty VcenterData
         $VCenterData = @()
