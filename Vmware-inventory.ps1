@@ -72,6 +72,9 @@ $ScriptBlock = {
         $VMs = get-vm -server $VCenterName | sort Name
         $VMs_NICs = Get-NetworkAdapter -VM *
         $VMs_Disks = Get-HardDisk -VM *
+        $VDC = (get-tagassignment -Category "VDC" -entity datacenters).tag.name
+
+        if(!$VDC){$VDC = ""}
 
         foreach ($VM in $VMs){
             
@@ -95,6 +98,7 @@ $ScriptBlock = {
                 HardwareVersion     	= $VM.HardwareVersion
                 PortGroupName			= $VM_NICs.NetworkName -join ','
                 vCenter             	= $VCenterName
+                VDC                     = $VDC
                 Host                	= $VM.VMHost.Name
                 Cluster             	= $VM.VMHost.Parent.name
                 GuestOS             	= $VM.Guest.OSFullName
@@ -137,6 +141,7 @@ $ScriptBlock = {
             HardwareVersion     	= "Couldn't Connect to $VCentername"
             PortGroupName			= "Couldn't Connect to $VCentername"
             vCenter             	= $VCenterName
+            VDC                     = "Couldn't Connect to $VCentername"
             Host                	= "Couldn't Connect to $VCentername"
             Cluster             	= "Couldn't Connect to $VCentername"
             GuestOS             	= "Couldn't Connect to $VCentername"
